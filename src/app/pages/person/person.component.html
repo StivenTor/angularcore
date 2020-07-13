@@ -1,0 +1,255 @@
+<mat-toolbar class="toolbar-page">
+  <h2>Personas</h2>
+</mat-toolbar>
+
+<div class="container page">
+  <div class="mat-elevation-z4">
+
+    <div class="example-header">
+      <div class="o-flex flex-wrap">
+
+        <div class="o-flexbox o-flex-1 u-h-full o-flex-align-items-center filter-table center-vertical">
+
+          <div class="inline">
+            <i class="material-icons pointer action">search</i>
+          </div>
+          <mat-form-field class="inline" style="width: 100%;">
+            <input matInput (keyup)="applyFilter($event.target.value)" placeholder="Buscar personas por id, nombre, apellido, edad o correo">
+          </mat-form-field>
+        </div>
+
+        <div class="o-flexbox u-h-full o-flex-align-items-right filter-table center-vertical actions-table">
+          <div class="inline">
+            <a mat-raised-button color="indigo" (click)="addUser()">Agregar Persona</a>
+          </div>
+          <div class="inline">
+            <i class="material-icons pointer action" (click)="loadPersons()">refresh</i>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="form-box mat-elevation-z8" *ngIf="showDialog">
+      <form [formGroup]="userForm" (ngSubmit)="userFormSubmit()" autocomplete="off">
+        <div class="modal-content">
+          <h4>{{!idUser ? 'Crear un Persona' : editReadOnly ? 'Consultar Persona' : 'Editar Persona'}}</h4>
+
+          <!-- <div>
+              <div class="row"> -->
+
+          <mat-grid-list cols="2" rowHeight="70px">
+
+            <mat-grid-tile>
+              <mat-form-field>
+                <input matInput formControlName="username" placeholder="Usuario" [readonly]="editReadOnly">
+              </mat-form-field>
+            </mat-grid-tile>
+
+            <mat-grid-tile>
+              <mat-form-field>
+                <mat-select placeholder="Tipo de documento" formControlName="doc_type" [disabled]="editReadOnly">
+                  <mat-option *ngFor="let option of docTypes" value="{{option.tyd_code}}">
+                    {{option.tyd_name}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+            </mat-grid-tile>
+
+            <mat-grid-tile>
+              <mat-form-field>
+                <input matInput formControlName="doc_number" placeholder="Número de documento" [readonly]="editReadOnly">
+              </mat-form-field>
+            </mat-grid-tile>
+
+            <mat-grid-tile>
+              <mat-form-field>
+                <input matInput type="text" formControlName="name" placeholder="Nombre" [readonly]="editReadOnly">
+              </mat-form-field>
+            </mat-grid-tile>
+
+            <mat-grid-tile>
+              <mat-form-field class="">
+                <input matInput type="text" formControlName="phone" placeholder="Teléfono" [readonly]="editReadOnly">
+              </mat-form-field>
+            </mat-grid-tile>
+
+            <mat-grid-tile>
+              <mat-form-field class="">
+                <input matInput type="text" formControlName="cellphone" placeholder="Celular" [readonly]="editReadOnly">
+              </mat-form-field>
+            </mat-grid-tile>
+
+
+            <mat-grid-tile>
+              <mat-form-field class="">
+                <mat-select placeholder="Ciudad" formControlName="codeCity" [disabled]="editReadOnly" [(ngModel)]="currentCity">
+                  <mat-form-field style="width: 100%; padding-left: 7px; padding-top: 15px;"> 
+                    <input matInput placeholder=" Buscar... " (keyup)="filterCity($event)">
+                  </mat-form-field>
+                  <mat-option *ngFor="let option of cities" value="{{option.cty_code}}">{{option.cty_nameProvince}}-{{option.cty_name}}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </mat-grid-tile>
+
+
+            <mat-grid-tile>
+              <mat-form-field class="">
+                <input matInput type="text" formControlName="address" placeholder="Dirección" [readonly]="editReadOnly">
+              </mat-form-field>
+            </mat-grid-tile>
+
+            <mat-grid-tile>
+              <mat-form-field class="">
+                <input matInput type="text" formControlName="neighborhood" placeholder="Barrio" [readonly]="editReadOnly">
+              </mat-form-field>
+            </mat-grid-tile>
+
+            <mat-grid-tile>
+              <mat-form-field class="">
+                <input matInput type="text" formControlName="email" placeholder="Correo" [readonly]="editReadOnly">
+              </mat-form-field>
+            </mat-grid-tile>
+
+            <mat-grid-tile>
+              <mat-form-field class="">
+                <mat-select placeholder="Roles" formControlName="role" [disabled]="editReadOnly">
+                  <mat-option *ngFor="let option of roles" value="{{option.rol_code}}">{{option.rol_name}}</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </mat-grid-tile>
+
+            <mat-grid-tile colspan="2" class="row-toggle">
+              <div class="row center-horizontal">
+
+                <div class="inline slide-toggle">
+                  <span class="slide-toggle-label">Token</span>
+                  <mat-slide-toggle formControlName="token" color="primary" labelPosition="before" [disabled]="editReadOnly">
+                    {{userForm.controls.token.value ? 'Sí' : 'No'}}
+                  </mat-slide-toggle>
+                </div>
+
+                <div class="inline slide-toggle">
+                  <span class="slide-toggle-label">Ver Saldo</span>
+                  <mat-slide-toggle formControlName="balance" color="primary" labelPosition="before" [disabled]="editReadOnly">
+                    {{userForm.controls.balance.value ? 'Sí' : 'No'}}
+                  </mat-slide-toggle>
+                </div>
+
+                <div class="inline slide-toggle">
+                  <span class="slide-toggle-label">Estado</span>
+                  <mat-slide-toggle formControlName="status" color="primary" labelPosition="before" [disabled]="editReadOnly">
+                    {{userForm.controls.status.value ? 'Activo' : 'Inactivo'}}
+                  </mat-slide-toggle>
+                </div>
+
+                <div class="inline slide-toggle">
+                  <span class="slide-toggle-label">Vendedor</span>
+                  <mat-slide-toggle formControlName="vendor" color="primary" labelPosition="before" [disabled]="editReadOnly">
+                    {{userForm.controls.vendor.value ? 'Sí' : 'No'}}
+                  </mat-slide-toggle>
+                </div>
+
+
+                <div class="inline slide-toggle">
+                  <span class="slide-toggle-label">Recaudador</span>
+                  <mat-slide-toggle formControlName="collector" color="primary" labelPosition="before" [disabled]="editReadOnly">
+                    {{userForm.controlscollector.value ? 'Sí' : 'No'}}
+                  </mat-slide-toggle>
+                </div>
+
+              </div>
+            </mat-grid-tile>
+
+          </mat-grid-list>
+
+          <!-- </div>
+            </div> -->
+
+        </div>
+        <div class="modal-footer pointer form-modal-footer">
+          <a class="" (click)="showDialog = false">
+            {{!editReadOnly ? 'Cancelar' : 'Cerrar'}}
+          </a>
+
+
+          <button mat-raised-button color="primary" type="submit" *ngIf="!editReadOnly">
+            {{!idUser ? 'Crear Persona' : 'Editar Persona'}}
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <mat-table #table [dataSource]="personTableDataSource" matSort>
+
+      <ng-container matColumnDef="usr_document">
+        <mat-header-cell *matHeaderCellDef mat-sort-header> Documento </mat-header-cell>
+        <mat-cell *matCellDef="let element"> {{element.usr_document}} </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="usr_name">
+        <mat-header-cell *matHeaderCellDef mat-sort-header> Nombre </mat-header-cell>
+        <mat-cell *matCellDef="let element"> {{element.usr_name}} </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="usr_userName">
+        <mat-header-cell *matHeaderCellDef mat-sort-header> Usuario </mat-header-cell>
+        <mat-cell *matCellDef="let element"> {{element.usr_userName}} </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="usr_email">
+        <mat-header-cell *matHeaderCellDef mat-sort-header> Correo </mat-header-cell>
+        <mat-cell *matCellDef="let element"> {{element.usr_email}} </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="usr_phone">
+        <mat-header-cell *matHeaderCellDef mat-sort-header> Teléfono </mat-header-cell>
+        <mat-cell *matCellDef="let element"> {{element.usr_phone}} </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="usr_distributorName">
+        <mat-header-cell *matHeaderCellDef mat-sort-header> Distribuidor </mat-header-cell>
+        <mat-cell *matCellDef="let element"> {{element.usr_distributorName}} </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="usr_commerceName">
+        <mat-header-cell *matHeaderCellDef mat-sort-header> Comercio </mat-header-cell>
+        <mat-cell *matCellDef="let element"> {{element.usr_commerceName}} </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="usr_status" mat-sort-header>
+        <mat-header-cell *matHeaderCellDef style="flex: 0 0 40px;"> Estado </mat-header-cell>
+        <mat-cell *matCellDef="let element" style="flex: 0 0 40px;"> {{element.usr_status ? 'Activo' : 'Inactivo'}}
+        </mat-cell>
+      </ng-container>
+
+      <ng-container matColumnDef="usr_action" mat-sort-header>
+        <mat-header-cell *matHeaderCellDef style="flex: 0 0 40px;"> </mat-header-cell>
+        <mat-cell *matCellDef="let element" style="flex: 0 0 40px;">
+
+          <div class="show_hover_table">
+            <button mat-icon-button [matMenuTriggerFor]="appMenu">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+          </div>
+
+          <mat-menu #appMenu="matMenu">
+            <button mat-menu-item (click)="recoveryPassword(element)">Recuperar contraseña</button>
+            <button mat-menu-item (click)="blockUser(element)">{{element.usr_status ? 'Inactivar' : 'Activar'}} usuario</button>
+            <button mat-menu-item (click)="editUser(element, false)">Editar usuario</button>
+            <button mat-menu-item (click)="editUser(element, true)">Consultar usuario</button>
+          </mat-menu>
+
+        </mat-cell>
+      </ng-container>
+
+
+
+      <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+      <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+    </mat-table>
+    <mat-paginator #paginator [pageSize]="10" [pageSizeOptions]="[5, 10, 20]" [showFirstLastButtons]="true">
+    </mat-paginator>
+
+  </div>
+</div>
