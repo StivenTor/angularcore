@@ -119,6 +119,10 @@
           }
         }
       }
-    }},
-  "defaultProject": "pruebanetcore"
+    }
+  },
+  "defaultProject": "pruebanetcore",
+  "cli": {
+    "analytics": false
+  }
 }
